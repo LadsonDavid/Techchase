@@ -1,9 +1,10 @@
 //Compiler.jsx
-import { useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { supabase } from "../supabaseClient";
+import supabase from "../supabaseClient";
 import { ClipLoader } from "react-spinners";
+import { gradientBg, cardStyle, glowEffect } from '../styles/SharedStyles';
 
 const PISTON_API_URL = "https://emkc.org/api/v2/piston/execute";
 
@@ -38,8 +39,9 @@ const Compiler = () => {
 
       if (data.run.stdout?.trim() === "Expected Output") {
         await supabase
-          .from("leaderboard")
-          .upsert([{ name: "Participant", points: 100 }]);
+          .from("users")
+          .update({ points: 100 })
+          .eq("email", state?.email);
       }
     } catch (error) {
       console.error("Execution error:", error);
@@ -50,67 +52,77 @@ const Compiler = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white px-4">
-      <div className="bg-gray-800 shadow-lg rounded-lg p-6 w-full max-w-3xl">
-        <h2 className="text-3xl font-bold text-center mb-6">Code Compiler</h2>
+    <div className={`min-h-screen ${gradientBg} p-6`}>
+      <div className={`${cardStyle} max-w-4xl mx-auto p-8 ${glowEffect}`}>
+        <h2 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text">
+          Fabulous Code Editor
+        </h2>
 
-        {/* Language Selector */}
-        <div className="mb-4">
-          <label className="block text-gray-300 text-sm mb-2">Select Language:</label>
-          <select
-            className="w-full p-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-          >
-            <option value="javascript">JavaScript</option>
-            <option value="python">Python</option>
-            <option value="java">Java</option>
-            <option value="cpp">C++</option>
-            <option value="c">C</option>
-          </select>
-        </div>
-
-        {/* Code Editor */}
-        <label className="block text-gray-300 text-sm mb-2">Write Your Code:</label>
-        <textarea
-          className="w-full h-52 p-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 mb-4"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="// Start coding here..."
-        ></textarea>
-
-        {/* Buttons */}
-        <div className="flex justify-between">
-          <button
-            className="bg-green-500 px-5 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
-            onClick={handleSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <ClipLoader size={20} color="#fff" />
-                Running...
-              </div>
-            ) : (
-              "Run Code"
-            )}
-          </button>
-
-          <button
-            className="bg-blue-500 px-5 py-2 rounded-lg font-semibold hover:bg-blue-600 transition"
-            onClick={() => navigate("/leaderboard")}
-          >
-            View Leaderboard
-          </button>
-        </div>
-
-        {/* Output Section */}
-        {output && (
-          <div className="mt-6 bg-gray-700 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-300 mb-2">Output:</h3>
-            <pre className="text-green-400 whitespace-pre-wrap">{output}</pre>
+        <div className="space-y-6">
+          <div>
+            <label className="text-purple-300 text-sm font-medium block mb-2">
+              Choose Your Programming Language
+            </label>
+            <select
+              className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-purple-500/30 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 text-white"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="c">C</option>
+            </select>
           </div>
-        )}
+
+          <div>
+            <label className="text-purple-300 text-sm font-medium block mb-2">
+              Write Your Spectacular Code
+            </label>
+            <textarea
+              className="w-full h-64 px-4 py-3 rounded-lg bg-gray-700/50 border border-purple-500/30 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 text-white font-mono"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="// Let your code shine..."
+            />
+          </div>
+
+          <div className="flex justify-between gap-4">
+            <button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="flex-1 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium transform hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 disabled:opacity-50"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <ClipLoader size={20} color="#fff" />
+                  <span>Creating Magic...</span>
+                </div>
+              ) : (
+                "Run Code"
+              )}
+            </button>
+
+            <button
+              onClick={() => navigate("/leaderboard")}
+              className="flex-1 py-4 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium transform hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30"
+            >
+              View Champions
+            </button>
+          </div>
+
+          {output && (
+            <div className="mt-6 rounded-lg bg-gray-700/50 p-6 border border-purple-500/30">
+              <h3 className="text-xl font-semibold text-purple-300 mb-4">
+                ✨ Output
+              </h3>
+              <pre className="text-green-400 font-mono whitespace-pre-wrap">
+                {output}
+              </pre>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
