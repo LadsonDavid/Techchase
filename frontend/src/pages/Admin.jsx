@@ -1,16 +1,10 @@
 import { useState } from "react";
 import Leaderboard from "./Leaderboard";
 
-
 const Admin = () => {
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  return (
-    <div>
-      <h2>Admin Dashboard</h2>
-      <Leaderboard />
-    </div>
-  );
+  
   const createRoom = () => {
     const newRoom = {
       id: rooms.length + 1,
